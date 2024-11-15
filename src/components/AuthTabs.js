@@ -1,14 +1,24 @@
 // src/components/AuthTabs.js
-import React, { useState } from 'react';
-import { Container, Tabs, Tab, Box, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Tabs, Tab, Box, Typography, Snackbar } from '@mui/material';
 import Register from './Register';
 import Login from './Login';
 
-const AuthTabs = () => {
-  const [activeTab, setActiveTab] = useState(0);
+const AuthTabs = ({ defaultTab }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab === 'register' ? 1 : 0);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    setActiveTab(defaultTab === 'register' ? 1 : 0);
+  }, [defaultTab]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+  };
+
+  const handleRegisterSuccess = () => {
+    setSuccessMessage('Registration successful! Please log in.');
+    setActiveTab(0); // Switch to Login tab
   };
 
   return (
@@ -34,7 +44,14 @@ const AuthTabs = () => {
         </Tabs>
 
         {activeTab === 0 && <Login />}
-        {activeTab === 1 && <Register />}
+        {activeTab === 1 && <Register onRegisterSuccess={handleRegisterSuccess} />}
+
+        <Snackbar
+          open={!!successMessage}
+          onClose={() => setSuccessMessage('')}
+          autoHideDuration={3000}
+          message={successMessage}
+        />
       </Box>
     </Container>
   );

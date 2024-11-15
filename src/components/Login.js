@@ -1,31 +1,72 @@
 // src/components/Login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useChatContext } from '../context/ChatContext';
-import { TextField, Button, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Box, Snackbar } from '@mui/material';
 
 const Login = () => {
   const { setUser } = useChatContext();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser && storedUser.username === username) {
-      setUser(storedUser);
-    } else {
-      alert('Incorrect username or password');
+  useEffect(() => {
+    if (sessionStorage.getItem('jwt')) {
+      navigate('/chat');
+    }
+  }, [navigate]);
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`http://0.0.0.0:5000/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setMessage(errorData.message || 'Login failed');
+        setSnackbarOpen(true);
+        return;
+      }
+
+      const responseData = await response.json();
+      if (responseData.token) {
+        // Save the token and set the user
+        sessionStorage.setItem('jwt', responseData.token);
+        setUser({ email });
+
+        setMessage('Login successful! Redirecting to chat...');
+        setSnackbarOpen(true);
+
+        setTimeout(() => {
+          setSnackbarOpen(false);
+          navigate('/chat');
+        }, 500);
+      } else {
+        setMessage('Invalid response format.');
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      setMessage('An error occurred during login');
+      setSnackbarOpen(true);
     }
   };
 
   return (
-    <Box mt={2}>
+    <Box mt={2} width="100%">
       <TextField
-        label="Username"
+        label="Email"
         variant="outlined"
         fullWidth
         margin="normal"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
       <TextField
         label="Password"
@@ -45,6 +86,13 @@ const Login = () => {
       >
         Login
       </Button>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        message={message}
+      />
     </Box>
   );
 };
