@@ -16,7 +16,7 @@ const Register = ({ onRegisterSuccess }) => {
     }
 
     try {
-      const response = await fetch(`http://0.0.0.0:5000/api/register`, {
+      const response = await fetch(`http://185.206.215.65:5000/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
