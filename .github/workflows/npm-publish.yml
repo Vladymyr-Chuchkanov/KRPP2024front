@@ -25,7 +25,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no root@185.206.215.65 << 'EOF'
         
-          pkill -f 'npm run' || true  
+          pkill -f 'serve -s dist' || true  
           
           cd KRPP/KRPP2024front
           
