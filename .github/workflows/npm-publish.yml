@@ -34,7 +34,7 @@ jobs:
           npm install || true 
           npm run build || true
 
-          nohup serve -s dist -p 3000 &
+          nohup serve -s dist -p 3000 > frontend.log 2>&1 &
           exit
 
         EOF
