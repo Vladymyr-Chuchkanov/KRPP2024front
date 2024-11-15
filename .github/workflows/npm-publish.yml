@@ -23,11 +23,10 @@ jobs:
 
     - name: SSH into server and deploy
       run: |
-        ssh -o StrictHostKeyChecking=no root@185.206.215.65 << 'EOF'
-        
-          pkill -f 'serve -s dist' || true  
-          
+        ssh -o StrictHostKeyChecking=no root@185.206.215.65 << 'EOF'        
+
           cd KRPP/KRPP2024front
+          pkill -f 'serve -s dist' || true
           
           git pull origin main
           npm install || true 
