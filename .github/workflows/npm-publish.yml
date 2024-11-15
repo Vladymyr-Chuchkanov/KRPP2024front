@@ -26,7 +26,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no root@185.206.215.65 << 'EOF'        
 
           cd KRPP/KRPP2024front
-          ps aux | grep 'serve -s dist' | grep -v grep | awk '{print $2}' | xargs kill -9 || true
+          ps aux | grep 'npm start' | grep -v grep | awk '{print $2}' | xargs kill -9 || true
+          ps aux | grep 'webpack' | grep -v grep | awk '{print $2}' | xargs kill -9 || true
           git reset --hard HEAD
           git fetch origin
           git checkout main
@@ -35,10 +36,8 @@ jobs:
           npm cache clean --force
           rm -rf node_modules
           rm package-lock.json 
-          npm install || true 
-          npm run build || true
-
-          nohup serve -s dist -p 3000 > frontend.log 2>&1 &
+          npm install || true
+          nohup npm start > frontend.log 2>&1 &
           exit
 
         EOF
