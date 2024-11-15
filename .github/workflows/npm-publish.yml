@@ -26,7 +26,11 @@ jobs:
         ssh -o StrictHostKeyChecking=no root@185.206.215.65 << 'EOF'        
 
           cd KRPP/KRPP2024front
-          ps aux | grep 'serve -s dist' | grep -v grep | awk '{print $2}' | xargs kill -9
+          ps aux | grep 'serve -s dist' | grep -v grep | awk '{print $2}' | xargs kill -9 || true
+          git reset --hard HEAD
+          git fetch origin
+          git checkout main
+          git reset --hard origin/main
           git pull origin main
           npm cache clean --force
           rm -rf node_modules
