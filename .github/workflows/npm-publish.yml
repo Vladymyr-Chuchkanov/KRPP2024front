@@ -27,12 +27,14 @@ jobs:
 
           cd KRPP/KRPP2024front
           pkill -f 'serve -s dist' || true
-          
           git pull origin main
+          npm cache clean --force
+          rm -rf node_modules
+          rm -y package-lock.json 
           npm install || true 
           npm run build || true
 
-          nohup serve -s dist frontend.log 2>&1 &
+          nohup serve -s dist -p 3000 -h 0.0.0.0 frontend.log 2>&1 &
           exit
 
         EOF
