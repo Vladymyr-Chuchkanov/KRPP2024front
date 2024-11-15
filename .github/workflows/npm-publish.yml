@@ -30,7 +30,7 @@ jobs:
           git pull origin main
           npm cache clean --force
           rm -rf node_modules
-          rm -y package-lock.json 
+          rm package-lock.json 
           npm install || true 
           npm run build || true
 
