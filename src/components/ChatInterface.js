@@ -7,7 +7,6 @@ import 'react-chat-elements/dist/main.css';
 
 const API_BASE_URL = 'http://185.206.215.65:5000/api/chats';
 const SOCKET_URL = 'http://185.206.215.65:5000';
-const TOKEN = sessionStorage.getItem('jwt');
 
 const ChatInterface = () => {
   const navigate = useNavigate();
@@ -17,8 +16,13 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [socket, setSocket] = useState(null);
+  const [token, setToken] = useState(sessionStorage.getItem('jwt'));
 
-  // Refs to hold the latest values
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem('jwt');
+    setToken(storedToken);
+  }, []);
+
   const selectedChatIdRef = useRef(selectedChatId);
   const messagesRef = useRef(messages);
 
@@ -30,7 +34,7 @@ const ChatInterface = () => {
   const fetchChats = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}`, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 401) {
         handleUnauthorized();
@@ -46,14 +50,15 @@ const ChatInterface = () => {
   const fetchMessages = async (chatId) => {
     try {
       const response = await fetch(`${API_BASE_URL}/${chatId}/messages`, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 401) {
         handleUnauthorized();
         return;
       }
       const data = await response.json();
-      setMessages(data.messages || []);
+      console.log(data.messages);
+      setMessages((data.messages || []).reverse());
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -67,7 +72,7 @@ const ChatInterface = () => {
       const response = await fetch(`${API_BASE_URL}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name: chatName }),
@@ -119,7 +124,7 @@ const ChatInterface = () => {
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL, {
-      query: { token: TOKEN },
+      query: { token: token },
     });
     setSocket(newSocket);
 

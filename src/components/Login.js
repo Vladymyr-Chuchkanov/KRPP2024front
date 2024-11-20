@@ -30,6 +30,7 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Error Response:', errorData);
         setMessage(errorData.message || 'Login failed');
         setSnackbarOpen(true);
         return;
@@ -37,7 +38,6 @@ const Login = () => {
 
       const responseData = await response.json();
       if (responseData.token) {
-        // Save the token and set the user
         sessionStorage.setItem('jwt', responseData.token);
         setUser({ email });
 
